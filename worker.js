@@ -1,6 +1,6 @@
 const MISTRAL_CHAT_URL = "https://api.mistral.ai/v1/chat/completions";
 
-const WORD_PATTERN = /^[\p{L}\p{M}\p{N}]+(?:[’'-][\p{L}\p{M}\p{N}]+)*[.,!?;:…]*$/u;
+const WORD_PATTERN = /^[\p{L}\p{M}\p{N}\p{P}\p{S}]+$/u;
 
 function corsFor(request, env) {
   const origin = request.headers.get("Origin");
