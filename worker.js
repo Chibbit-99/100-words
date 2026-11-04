@@ -178,11 +178,15 @@ export default {
         return json({ error: "Mistral did not return exactly one word. Please try again." }, 502, headers);
       }
 
-      return json({
-        word,
-        wordCount: currentWordCount + 1,
-        complete: currentWordCount + 1 === 100,
-      }, 200, headers);
+      return new Response(word, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+          ...headers,
+        },
+      });
     } catch (error) {
       console.error("Mistral request failed:", error?.name || "Error");
       if (error?.name === "TimeoutError") {
