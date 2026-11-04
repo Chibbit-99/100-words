@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -29,6 +29,19 @@ jobs:
 
       - name: Build static site
         run: npm run build -- --outDir app --base=./ --emptyOutDir
+
+      - name: Commit generated /app directory
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/
+          if git diff --cached --quiet; then
+            echo "The generated site is already up to date."
+          else
+            git commit -m "Build static site [skip ci]"
+            git push
+          fi
 
       - name: Upload static site
         uses: actions/upload-artifact@v4
