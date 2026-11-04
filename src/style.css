@@ -1,0 +1,93 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap");
+
+:root {
+  font-family: "DM Sans", sans-serif;
+  color: #e9e9eb;
+  background: #101114;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --panel: #17181d;
+  --muted: #858690;
+  --line: #292a31;
+  --accent: #c6a7ff;
+  --green: #78d6a0;
+  --red: #ee7777;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, textarea, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled, select:disabled { cursor: not-allowed; opacity: .5; }
+#app { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 248px; flex: 0 0 248px; padding: 27px 20px 20px;
+  background: #141519; border-right: 1px solid var(--line);
+  display: flex; flex-direction: column;
+}
+.brand { display: flex; align-items: center; gap: 10px; color: #f2f0f7; text-decoration: none; font-size: 18px; font-weight: 600; letter-spacing: -.6px; }
+.brand-mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--accent); color: #21172f; font: 500 12px "DM Mono", monospace; }
+.new-chat { margin-top: 42px; width: 100%; padding: 12px 13px; text-align: left; color: #e9e5f1; background: #222128; border: 1px solid #34313d; border-radius: 9px; font-size: 13px; }
+.new-chat span { color: var(--accent); margin-right: 8px; font-size: 17px; vertical-align: -1px; }
+.sidebar-label { margin: 35px 0 10px; color: #696a75; font: 10px "DM Mono", monospace; letter-spacing: 1.1px; }
+.sidebar-note { max-width: 180px; color: #858690; font-size: 12px; line-height: 1.7; }
+.sidebar-footer { display: flex; align-items: center; gap: 9px; margin-top: auto; color: #8f909a; font-size: 11px; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #777; }
+
+.main { display: flex; flex: 1; min-width: 0; flex-direction: column; min-height: 100vh; }
+.topbar { height: 68px; flex: 0 0 68px; display: flex; align-items: center; justify-content: flex-end; gap: 18px; padding: 0 34px; border-bottom: 1px solid var(--line); }
+.model-area { display: flex; align-items: center; gap: 12px; }
+.model-area label { color: #73747f; font: 10px "DM Mono", monospace; letter-spacing: 1px; }
+.model-area select { max-width: min(380px, 48vw); padding: 8px 30px 8px 10px; color: #d9d5e1; background: #1b1c22; border: 1px solid #30313a; border-radius: 7px; font-size: 12px; outline: none; }
+.icon-button { width: 34px; height: 34px; color: #9b9ba5; background: transparent; border: 1px solid var(--line); border-radius: 8px; font-size: 18px; }
+.mobile-brand { display: none; }
+
+.conversation { flex: 1; width: 100%; max-width: 850px; margin: 0 auto; padding: 70px 34px 30px; }
+.welcome { max-width: 570px; margin: 35px auto 0; }
+.welcome-kicker { color: var(--accent); font: 10px "DM Mono", monospace; letter-spacing: 1.7px; }
+.welcome h1 { margin: 22px 0 16px; font-size: clamp(48px, 7vw, 76px); line-height: .99; letter-spacing: -5px; font-weight: 500; }
+.welcome h1 span { color: #8e8999; }
+.welcome p { max-width: 410px; color: #92929c; font-size: 14px; line-height: 1.8; }
+.suggestions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 30px; }
+.suggestion { padding: 9px 12px; color: #b8b4c1; background: #191a20; border: 1px solid #30313a; border-radius: 7px; font-size: 11px; }
+.suggestion:hover { border-color: #75628f; color: #eee8f8; }
+
+.messages { display: flex; flex-direction: column; gap: 30px; }
+.message { display: flex; align-items: flex-start; gap: 14px; }
+.message-avatar { flex: 0 0 29px; width: 29px; height: 29px; display: grid; place-items: center; border-radius: 9px; color: #27202f; background: var(--accent); font-size: 12px; font-weight: 700; }
+.message.user .message-avatar { color: #d1d0d8; background: #30313a; }
+.message-body { min-width: 0; flex: 1; padding-top: 2px; }
+.message-label { margin-bottom: 8px; color: #858590; font: 10px "DM Mono", monospace; letter-spacing: 1px; }
+.message-text { color: #e1dfe6; font-size: 14px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.message.assistant .message-text { color: #d5d2dc; }
+
+.composer-wrap { width: 100%; max-width: 850px; margin: 0 auto; padding: 0 34px 22px; }
+.composer { padding: 14px 14px 10px 18px; background: #1a1b21; border: 1px solid #353640; border-radius: 12px; box-shadow: 0 10px 35px #0003; }
+.composer:focus-within { border-color: #75628f; }
+.composer textarea { display: block; width: 100%; min-height: 30px; max-height: 180px; resize: none; color: #efedf3; background: transparent; border: 0; outline: 0; font-size: 14px; line-height: 1.6; }
+.composer textarea::placeholder { color: #73747e; }
+.composer-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; }
+.composer-hint { color: #777883; font-size: 10px; }
+#send-button { width: 32px; height: 32px; border: 0; border-radius: 8px; color: #21172f; background: var(--accent); font-size: 20px; line-height: 1; }
+#send-button:disabled { background: #48434f; color: #a19ba9; opacity: 1; }
+.disclaimer { margin: 11px 0 0; text-align: center; color: #646570; font-size: 10px; }
+.load-panel { margin-bottom: 12px; padding: 12px 14px; background: #191a20; border: 1px solid var(--line); border-radius: 9px; }
+.load-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 9px; color: #aaa7b2; font-size: 11px; }
+#load-percent { color: var(--accent); font-family: "DM Mono", monospace; }
+.progress-track { height: 3px; overflow: hidden; background: #34323b; border-radius: 4px; }
+#load-progress { height: 100%; width: 0; background: var(--accent); transition: width .2s ease; }
+
+@media (max-width: 700px) {
+  .sidebar { display: none; }
+  .topbar { height: 60px; flex-basis: 60px; justify-content: space-between; padding: 0 16px; }
+  .mobile-brand { display: block; color: #f2f0f7; font-weight: 700; font-size: 15px; }
+  .mobile-brand span { font-weight: 400; color: #aaa5b4; }
+  .model-area { gap: 7px; }
+  .model-area label { display: none; }
+  .model-area select { max-width: 55vw; font-size: 10px; }
+  .conversation { padding: 38px 19px 25px; }
+  .welcome { margin-top: 42px; }
+  .welcome h1 { letter-spacing: -3px; }
+  .composer-wrap { padding: 0 13px 15px; }
+}
