@@ -61,7 +61,7 @@ export default {
       return json({
         ok: true,
         service: "100-words-api",
-        model: env.MISTRAL_MODEL || "ministral-3b-2512",
+        model: env.MISTRAL_MODEL || "mistral-small-2603",
         endpoint: "POST /next-word",
       }, 200, headers);
     }
@@ -118,7 +118,7 @@ export default {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: env.MISTRAL_MODEL || "ministral-3b-2512",
+          model: env.MISTRAL_MODEL || "mistral-small-2603",
           messages: [
             {
               role: "system",
@@ -138,8 +138,8 @@ export default {
             },
           ],
           response_format: { type: "json_object" },
-          temperature: 0.75,
-          top_p: 0.9,
+          reasoning_effort: "none",
+          temperature: 0.7,
           max_tokens: 32,
           stream: false,
         }),
