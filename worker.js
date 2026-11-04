@@ -61,7 +61,7 @@ export default {
       return json({
         ok: true,
         service: "100-words-api",
-        model: env.MISTRAL_MODEL || "mistral-small-2603",
+        model: env.MISTRAL_MODEL || "ministral-8b-latest",
         endpoint: "POST /next-word",
       }, 200, headers);
     }
@@ -118,7 +118,7 @@ export default {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: env.MISTRAL_MODEL || "mistral-small-2603",
+          model: env.MISTRAL_MODEL || "ministral-8b-latest",
           messages: [
             {
               role: "system",
@@ -138,7 +138,6 @@ export default {
             },
           ],
           response_format: { type: "json_object" },
-          reasoning_effort: "none",
           temperature: 0.7,
           max_tokens: 32,
           stream: false,
@@ -148,14 +147,33 @@ export default {
 
       if (!upstream.ok) {
         const status = upstream.status;
+        let providerMessage = "";
+        try {
+          const errorBody = await upstream.json();
+          const detail = errorBody?.message || errorBody?.error?.message || errorBody?.error;
+          if (typeof detail === "string") providerMessage = detail.slice(0, 300);
+        } catch {
+          // Some upstream errors do not return JSON.
+        }
+
         if (status === 401 || status === 403) {
           return json({ error: "Mistral rejected the API key. Check the MISTRAL_API_KEY secret." }, 502, headers);
         }
         if (status === 429) {
-          return json({ error: "Mistral rate limit reached. Try again shortly." }, 429, headers);
+          const retryAfter = upstream.headers.get("Retry-After");
+          return json({
+            error: providerMessage
+              ? "Mistral rate limit: " + providerMessage
+              : "Mistral rate limit reached. Check your organization's model limits and API tier.",
+            retryAfter: retryAfter || null,
+            model: env.MISTRAL_MODEL || "ministral-8b-latest",
+          }, 429, headers);
         }
-        console.error("Mistral API returned HTTP", status);
-        return json({ error: "The Mistral API request failed.", upstreamStatus: status }, 502, headers);
+        console.error("Mistral API returned HTTP", status, providerMessage);
+        return json({
+          error: providerMessage || "The Mistral API request failed.",
+          upstreamStatus: status,
+        }, 502, headers);
       }
 
       const result = await upstream.json();
