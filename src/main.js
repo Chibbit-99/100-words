@@ -1,8 +1,7 @@
-import { CreateMLCEngine, prebuiltAppConfig } from "@mlc-ai/web-llm";
+import { CreateMLCEngine } from "@mlc-ai/web-llm";
 import "./style.css";
 
 const $ = (id) => document.getElementById(id);
-const modelSelect = $("model-select");
 const promptInput = $("prompt");
 const sendButton = $("send-button");
 const chatForm = $("chat-form");
@@ -20,25 +19,7 @@ let generating = false;
 let activeModel = "";
 let conversation = [];
 
-const models = prebuiltAppConfig.model_list;
-const preferred = [
-  "Qwen3-0.6B-q4f16_1-MLC",
-  "Llama-3.2-1B-Instruct-q4f16_1-MLC",
-  "Phi-3.5-mini-instruct-q4f16_1-MLC"
-];
-
-function populateModels() {
-  modelSelect.replaceChildren();
-  const sorted = [...models].sort((a, b) => a.model_id.localeCompare(b.model_id));
-  const preferredModel = preferred.find((id) => sorted.some((m) => m.model_id === id));
-  for (const model of sorted) {
-    const option = document.createElement("option");
-    option.value = model.model_id;
-    option.textContent = model.model_id.replace(/-MLC$/, "");
-    modelSelect.append(option);
-  }
-  if (preferredModel) modelSelect.value = preferredModel;
-}
+const MODEL_ID = "SmolLM2-360M-Instruct-q4f16_1-MLC";
 
 function setDeviceStatus(ready) {
   $("device-status").textContent = ready ? "WebGPU available" : "WebGPU unavailable";
@@ -49,19 +30,17 @@ async function checkWebGPU() {
   if (!("gpu" in navigator)) {
     setDeviceStatus(false);
     composerHint.textContent = "WebGPU is not available in this browser";
-    modelSelect.disabled = true;
     return false;
   }
   try {
     const adapter = await navigator.gpu.requestAdapter();
     if (!adapter) throw new Error("No compatible GPU adapter found");
     setDeviceStatus(true);
-    composerHint.textContent = "Select a model, then send a message";
+    composerHint.textContent = "Loading SmolLM2-360M…";
     return true;
   } catch (error) {
     setDeviceStatus(false);
     composerHint.textContent = error.message || "Could not access WebGPU";
-    modelSelect.disabled = true;
     return false;
   }
 }
@@ -69,7 +48,6 @@ async function checkWebGPU() {
 function setBusy(busy) {
   promptInput.disabled = busy || !engine;
   sendButton.disabled = busy || !engine || !promptInput.value.trim();
-  modelSelect.disabled = busy || loading;
   $("new-chat").disabled = busy;
   $("clear-chat").disabled = busy;
 }
@@ -86,8 +64,8 @@ function hideProgress() {
   loadPanel.hidden = true;
 }
 
-async function loadModel(modelId) {
-  if (loading || (engine && activeModel === modelId)) return;
+async function loadModel() {
+  if (loading || (engine && activeModel === MODEL_ID)) return;
   loading = true;
   engine = null;
   activeModel = "";
@@ -95,11 +73,11 @@ async function loadModel(modelId) {
   composerHint.textContent = "Downloading and preparing the model…";
   showProgress("Starting model…", 0);
   try {
-    const nextEngine = await CreateMLCEngine(modelId, {
+    const nextEngine = await CreateMLCEngine(MODEL_ID, {
       initProgressCallback: (report) => showProgress(report.text, report.progress)
     });
     engine = nextEngine;
-    activeModel = modelId;
+    activeModel = MODEL_ID;
     composerHint.textContent = "Ready · running locally on your device";
     promptInput.disabled = false;
     promptInput.focus();
@@ -109,7 +87,6 @@ async function loadModel(modelId) {
     showProgress("Model failed to load", 0);
   } finally {
     loading = false;
-    modelSelect.disabled = false;
     sendButton.disabled = !engine || !promptInput.value.trim();
     $("new-chat").disabled = false;
     $("clear-chat").disabled = false;
@@ -189,7 +166,6 @@ function clearChat() {
   promptInput.focus();
 }
 
-modelSelect.addEventListener("change", () => loadModel(modelSelect.value));
 chatForm.addEventListener("submit", (event) => {
   event.preventDefault();
   sendMessage(promptInput.value);
@@ -211,7 +187,6 @@ document.querySelectorAll(".suggestion").forEach((button) => {
   });
 });
 
-populateModels();
 checkWebGPU().then((available) => {
-  if (available) loadModel(modelSelect.value);
+  if (available) loadModel();
 });
