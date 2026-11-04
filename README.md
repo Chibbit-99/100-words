@@ -1,6 +1,10 @@
-# 100 Words API
+# 100 Words
 
-A Cloudflare Worker backend for **100 Words**, a collaborative story game where each turn adds exactly one word until the story reaches 100 words.
+A collaborative story game where you and Mistral take turns adding exactly one word until the story reaches 100 words.
+
+- `index.html` is the standalone browser frontend. Host it on any static web host, then enter your deployed Worker URL under **API settings**.
+- `worker.js` is the Cloudflare Worker backend. It calls the Mistral API and keeps the Mistral API key server-side.
+- `wrangler.jsonc` points Wrangler directly at `worker.js`. It intentionally has no static-assets configuration, so `wrangler deploy` deploys the Worker and does not serve `index.html`.
 
 The Worker sends the story so far to the Mistral API and returns the next word. The Mistral API key stays on the server as a Cloudflare Worker secret.
 
@@ -34,7 +38,7 @@ The default model is `ministral-3b-2512` (Ministral 3 3B). Change `MISTRAL_MODEL
 
 ## Deploy to Cloudflare Workers
 
-This repository is configured as a **Worker-only project**. Wrangler's `main` entry is `worker.js`; there is no `assets` directory configured, so Wrangler deploys the Worker script rather than treating `index.html` as a site.
+This repository is configured as a **Worker-only project**. Wrangler's `main` entry is `worker.js`; there is no `assets` directory configured, so Wrangler deploys the Worker script, not the static frontend.
 
 1. Install the dependencies:
 
