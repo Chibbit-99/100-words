@@ -353,7 +353,8 @@
       const completePanel = $("complete-panel");
       const gameMessage = $("game-message");
 
-      let workerEndpoint = "";
+      const DEFAULT_WORKER_URL = "https://100-words.chibbit99.workers.dev/next-word";
+      let workerEndpoint = DEFAULT_WORKER_URL;
       let words = [];
       let aiThinking = false;
       let aiNeedsRetry = false;
@@ -405,20 +406,17 @@
         try {
           saved = localStorage.getItem("100words-worker-url") || "";
         } catch {
-          // Storage may be disabled by the browser.
+          // Storage may be disabled by the browser; use the built-in Worker URL.
         }
-        if (saved) {
-          try {
-            workerEndpoint = normaliseEndpoint(saved);
-            workerUrlInput.value = workerEndpoint.replace(/\/next-word\/?$/, "");
-            setConnection("Worker URL loaded", true);
-          } catch {
-            setConnection("Saved Worker URL is invalid", false);
-            settings.open = true;
-          }
-        } else {
-          settings.open = true;
-          setConnection("Worker URL not configured", false);
+
+        try {
+          workerEndpoint = normaliseEndpoint(saved || DEFAULT_WORKER_URL);
+          workerUrlInput.value = workerEndpoint.replace(/\/next-word\/?$/, "");
+          setConnection(saved ? "Saved Worker URL loaded" : "Connected to 100 Words Worker", true);
+        } catch {
+          workerEndpoint = normaliseEndpoint(DEFAULT_WORKER_URL);
+          workerUrlInput.value = workerEndpoint.replace(/\/next-word\/?$/, "");
+          setConnection("Using default Worker URL", true);
         }
       }
 
