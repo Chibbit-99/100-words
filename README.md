@@ -19,10 +19,16 @@ Open the local URL printed by Vite. The app downloads the selected model the fir
 
 ## Production build
 
+The GitHub Actions workflow builds the static site into `app/` and uploads it as the `100-words-static-site` workflow artifact on pushes to `main`, pull requests, and manual runs.
+
+To create the same output locally:
+
 ```bash
-npm run build
-npm run preview
+npm install
+npm run build -- --outDir app --base=./ --emptyOutDir
 ```
+
+The contents of `app/` are static files and can be hosted by any static web host. Download the artifact from the completed workflow run in the repository's **Actions** tab.
 
 ## Notes
 
