@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ef">
+  <meta name="description" content="A collaborative story game. One word at a time. One hundred words total.">
+  <title>100 Words — One word at a time</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f6f4ef;
+      --ink: #22231f;
+      --muted: #77786f;
+      --line: #deddd5;
+      --panel: #fffefa;
+      --green: #356b50;
+      --green-soft: #e5eee7;
+      --violet: #7256a4;
+      --violet-soft: #eee8f7;
+      --warning: #a15e30;
+      --shadow: 0 18px 50px rgba(39, 36, 26, .07);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 12% 0%, rgba(212, 223, 207, .42), transparent 38rem),
+        var(--paper);
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .5; }
+    .shell { width: min(100% - 44px, 1040px); margin: 0 auto; }
+
+    header {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+    .brand-mark {
+      display: grid; place-items: center; width: 38px; height: 38px;
+      border-radius: 12px; background: var(--ink); color: #f8f6ef;
+      font-size: 12px; font-weight: 800; letter-spacing: -.6px;
+    }
+    .brand-copy { display: grid; gap: 1px; }
+    .brand-name { font-size: 14px; font-weight: 750; letter-spacing: -.3px; }
+    .brand-tag { color: var(--muted); font-size: 10px; letter-spacing: 1.3px; text-transform: uppercase; }
+
+    .settings { position: relative; }
+    .settings summary {
+      list-style: none; padding: 9px 12px; border: 1px solid var(--line);
+      border-radius: 9px; color: #56574f; background: rgba(255,255,255,.54);
+      font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .settings summary::-webkit-details-marker { display: none; }
+    .settings summary::before { content: "⚙"; margin-right: 8px; }
+    .settings[open] summary { border-color: #b9b8ae; }
+    .settings-panel {
+      position: absolute; z-index: 5; top: calc(100% + 10px); right: 0;
+      width: min(360px, calc(100vw - 44px)); padding: 16px;
+      border: 1px solid var(--line); border-radius: 13px; background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .settings-panel label, .field-label {
+      display: block; margin-bottom: 7px; color: #55564e;
+      font-size: 11px; font-weight: 750; letter-spacing: .4px;
+    }
+    .settings-row { display: flex; gap: 8px; }
+    input {
+      width: 100%; min-width: 0; padding: 12px 13px; outline: none;
+      border: 1px solid #d6d5cc; border-radius: 9px; color: var(--ink);
+      background: #fff; font-size: 13px;
+    }
+    input:focus { border-color: #78967f; box-shadow: 0 0 0 3px rgba(91,132,102,.12); }
+    .settings-row button, .primary-button {
+      border: 0; border-radius: 9px; padding: 0 15px; background: var(--ink);
+      color: white; font-size: 12px; font-weight: 700; white-space: nowrap;
+    }
+    .settings-help { margin: 9px 0 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .connection-state { display: flex; align-items: center; gap: 7px; margin-top: 10px; color: var(--muted); font-size: 10px; }
+    .connection-dot { width: 7px; height: 7px; border-radius: 50%; background: #b3a17e; }
+    .connection-dot.ready { background: #4f9668; }
+
+    main { padding: 65px 0 70px; }
+    .intro { max-width: 680px; margin: 0 auto 34px; text-align: center; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px; color: var(--green);
+      font-size: 10px; font-weight: 800; letter-spacing: 1.7px; text-transform: uppercase;
+    }
+    .eyebrow::before, .eyebrow::after { content: ""; width: 18px; height: 1px; background: #9fb5a3; }
+    h1 {
+      margin: 16px 0 12px; font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(54px, 9vw, 92px); font-weight: 500; line-height: .95;
+      letter-spacing: -5px;
+    }
+    h1 span { color: var(--green); font-style: italic; }
+    .intro p { max-width: 470px; margin: 0 auto; color: var(--muted); font-size: 14px; line-height: 1.8; }
+
+    .setup-card, .game-card {
+      width: min(100%, 760px); margin: 0 auto; padding: 25px;
+      border: 1px solid var(--line); border-radius: 17px; background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .setup-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 19px; }
+    .setup-heading h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 500; }
+    .setup-heading span { color: var(--muted); font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .8px; }
+    .starter-row { display: flex; gap: 10px; }
+    .starter-row input { flex: 1; font-size: 15px; }
+    .primary-button { min-height: 45px; padding: 0 18px; }
+    .primary-button:hover:not(:disabled) { background: #3f5748; }
+    .hint { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .hint.error { color: #a34235; }
+    .rules {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin-top: 18px; padding-top: 18px; border-top: 1px solid #eeede7;
+    }
+    .rule { display: flex; gap: 9px; align-items: flex-start; color: #686960; font-size: 10px; line-height: 1.5; }
+    .rule strong { display: block; color: #383931; font-size: 11px; }
+    .rule-num {
+      display: grid; place-items: center; flex: 0 0 23px; width: 23px; height: 23px;
+      border-radius: 7px; background: #eeeee7; color: #5a6257; font: 10px ui-monospace, monospace;
+    }
+
+    .game-view[hidden], .setup-view[hidden] { display: none; }
+    .game-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 15px; }
+    .game-kicker { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1.3px; text-transform: uppercase; }
+    .count { color: #57584f; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .count strong { color: var(--ink); font-size: 18px; }
+    .meter { height: 5px; overflow: hidden; border-radius: 20px; background: #ecebe4; }
+    .meter-fill { width: 1%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6b9373, #a2b58a); transition: width .25s ease; }
+    .story-area { min-height: 230px; margin: 22px 0 18px; padding: 22px; border: 1px solid #e9e8df; border-radius: 13px; background: #fbfaf5; }
+    .story-words { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px 7px; }
+    .word-chip {
+      display: inline-flex; align-items: center; padding: 6px 9px; border-radius: 7px;
+      background: #eeeee8; color: #34352f; font-family: Georgia, "Times New Roman", serif;
+      font-size: 17px; line-height: 1.15; animation: appear .18s ease-out;
+    }
+    .word-chip.you { background: var(--green-soft); color: #315b41; }
+    .word-chip.ai { background: var(--violet-soft); color: #634b8c; }
+    @keyframes appear { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .legend { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; color: var(--muted); font-size: 10px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 3px; }
+    .legend .you-dot { background: #8eaf96; }
+    .legend .ai-dot { background: #b4a0d4; }
+
+    .turn-panel { margin-top: 19px; padding: 17px; border-radius: 12px; background: #f1f0e9; }
+    .turn-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 11px; }
+    .turn-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; }
+    .turn-avatar { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; background: var(--green-soft); color: var(--green); font-size: 11px; }
+    .turn-avatar.ai { background: var(--violet-soft); color: var(--violet); }
+    .turn-status { color: var(--muted); font-size: 10px; }
+    .word-form { display: flex; gap: 9px; }
+    .word-form input { flex: 1; background: #fffefa; }
+    .word-form button { min-width: 105px; }
+    .turn-hint { min-height: 16px; margin: 8px 0 0; color: var(--muted); font-size: 10px; }
+    .turn-hint.error { color: #a34235; }
+    .thinking { display: flex; align-items: center; gap: 10px; color: #65528a; font-size: 12px; }
+    .dots { display: inline-flex; gap: 3px; }
+    .dots i { width: 5px; height: 5px; border-radius: 50%; background: #8f79b5; animation: bounce .8s ease-in-out infinite alternate; }
+    .dots i:nth-child(2) { animation-delay: .15s; }
+    .dots i:nth-child(3) { animation-delay: .3s; }
+    @keyframes bounce { to { transform: translateY(-4px); opacity: .45; } }
+    .retry { padding: 9px 12px; border: 1px solid #d7cce6; border-radius: 8px; background: #f8f4fc; color: #634b8c; font-size: 11px; font-weight: 700; }
+    .complete-panel { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .complete-panel strong { display: block; font-family: Georgia, "Times New Roman", serif; font-size: 21px; font-weight: 500; }
+    .complete-panel p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+    .secondary-button {
+      min-height: 38px; padding: 0 13px; border: 1px solid #d6d5cc; border-radius: 8px;
+      background: transparent; color: #55564e; font-size: 11px; font-weight: 700;
+    }
+    .game-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+    .game-actions .hint { margin: 0; }
+
+    footer { margin-top: 28px; text-align: center; color: #92938a; font-size: 10px; }
+    footer a { color: #666b60; }
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 28px, 1040px); }
+      header { min-height: 68px; }
+      main { padding: 48px 0 50px; }
+      h1 { letter-spacing: -3px; }
+      .setup-card, .game-card { padding: 17px; }
+      .starter-row, .word-form { flex-direction: column; }
+      .starter-row button, .word-form button { min-height: 44px; }
+      .rules { grid-template-columns: 1fr; gap: 10px; }
+      .story-area { min-height: 260px; padding: 15px; }
+      .word-chip { font-size: 16px; }
+      .turn-header { align-items: flex-start; flex-direction: column; gap: 5px; }
+      .game-actions { align-items: flex-start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a class="brand" href="./" aria-label="100 Words home">
+        <span class="brand-mark">100</span>
+        <span class="brand-copy">
+          <span class="brand-name">100 Words</span>
+          <span class="brand-tag">A collaborative story</span>
+        </span>
+      </a>
+      <details class="settings" id="settings">
+        <summary>API settings</summary>
+        <div class="settings-panel">
+          <form id="endpoint-form">
+            <label for="worker-url">Cloudflare Worker URL</label>
+            <div class="settings-row">
+              <input id="worker-url" type="url" placeholder="https://100-words-api.example.workers.dev" autocomplete="url" spellcheck="false" required>
+              <button type="submit">Save</button>
+            </div>
+          </form>
+          <p class="settings-help">Paste your deployed Worker URL. You can enter the base URL or the full /next-word endpoint. Your Mistral key stays on Cloudflare and is never needed here.</p>
+          <div class="connection-state"><i class="connection-dot" id="connection-dot"></i><span id="connection-text">Worker URL not configured</span></div>
+        </div>
+      </details>
+    </header>
+
+    <main>
+      <section class="setup-view" id="setup-view">
+        <div class="intro">
+          <div class="eyebrow">ONE WORD AT A TIME</div>
+          <h1>100 <span>Words.</span></h1>
+          <p>A story built together. You add one word, Mistral adds one word, and the story keeps growing until it reaches exactly one hundred.</p>
+        </div>
+
+        <section class="setup-card">
+          <div class="setup-heading">
+            <h2>Start the story</h2>
+            <span>YOUR WORD · 01 / 100</span>
+          </div>
+          <form id="start-form">
+            <label class="field-label" for="starter-word">Choose your opening word</label>
+            <div class="starter-row">
+              <input id="starter-word" type="text" maxlength="48" placeholder="Midnight" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+              <button class="primary-button" type="submit">Start writing <span aria-hidden="true">↗</span></button>
+            </div>
+            <p class="hint" id="setup-hint">Start with a single word. Mistral takes the next turn automatically.</p>
+          </form>
+          <div class="rules">
+            <div class="rule"><span class="rule-num">01</span><span><strong>Take turns</strong>You and Mistral alternate one word each.</span></div>
+            <div class="rule"><span class="rule-num">02</span><span><strong>Keep it going</strong>Each word becomes part of the same story.</span></div>
+            <div class="rule"><span class="rule-num">03</span><span><strong>Stop at 100</strong>The hundredth word ends the round.</span></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="game-view" id="game-view" hidden>
+        <div class="intro">
+          <div class="eyebrow">THE STORY SO FAR</div>
+          <h1>Keep it <span>going.</span></h1>
+          <p>One word from you. One word from Mistral. See where the story goes.</p>
+        </div>
+
+        <section class="game-card">
+          <div class="game-top">
+            <span class="game-kicker">STORY IN PROGRESS</span>
+            <span class="count"><strong id="word-count">1</strong> / 100 WORDS</span>
+          </div>
+          <div class="meter" role="progressbar" aria-label="Story word count" aria-valuemin="0" aria-valuemax="100" aria-valuenow="1" id="word-meter">
+            <div class="meter-fill" id="meter-fill"></div>
+          </div>
+
+          <div class="story-area">
+            <div class="story-words" id="story-words" aria-live="polite"></div>
+          </div>
+          <div class="legend">
+            <span><i class="you-dot"></i> Your words</span>
+            <span><i class="ai-dot"></i> Mistral's words</span>
+          </div>
+
+          <div class="turn-panel" id="turn-panel">
+            <div class="turn-header">
+              <div class="turn-title"><span class="turn-avatar ai" id="turn-avatar">✦</span><span id="turn-title">Mistral's turn</span></div>
+              <span class="turn-status" id="turn-status">Adding one word…</span>
+            </div>
+            <div id="thinking-view" class="thinking">
+              <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span>Thinking of the next word</span>
+            </div>
+            <form class="word-form" id="word-form" hidden>
+              <input id="next-word" type="text" maxlength="48" placeholder="Your next word…" autocomplete="off" autocapitalize="off" spellcheck="false" disabled>
+              <button class="primary-button" type="submit" disabled>Add word <span aria-hidden="true">↗</span></button>
+            </form>
+            <div id="retry-view" hidden>
+              <p class="hint error" id="retry-error">Mistral couldn't respond.</p>
+              <button type="button" class="retry" id="retry-button">Retry Mistral's turn</button>
+            </div>
+            <p class="turn-hint" id="turn-hint"></p>
+          </div>
+
+          <div class="complete-panel" id="complete-panel" hidden>
+            <div><strong>The story is complete.</strong><p>You made it to 100 words. Every word counted.</p></div>
+            <button type="button" class="primary-button" id="play-again">Play again ↗</button>
+          </div>
+
+          <div class="game-actions">
+            <p class="hint" id="game-message">The first word is yours. Mistral goes next.</p>
+            <button class="secondary-button" type="button" id="copy-story">Copy story</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer>Built word by word · <span id="footer-model">Powered by your Cloudflare Worker + Mistral</span></footer>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const WORD_PATTERN = /^[\\p{L}\\p{M}\\p{N}]+(?:[’'-][\\p{L}\\p{M}\\p{N}]+)*[.,!?;:…]*$/u;
+      const $ = (id) => document.getElementById(id);
+
+      const settings = $("settings");
+      const workerUrlInput = $("worker-url");
+      const endpointForm = $("endpoint-form");
+      const connectionDot = $("connection-dot");
+      const connectionText = $("connection-text");
+      const setupView = $("setup-view");
+      const gameView = $("game-view");
+      const starterInput = $("starter-word");
+      const setupHint = $("setup-hint");
+      const storyWords = $("story-words");
+      const wordCount = $("word-count");
+      const wordMeter = $("word-meter");
+      const meterFill = $("meter-fill");
+      const turnPanel = $("turn-panel");
+      const turnAvatar = $("turn-avatar");
+      const turnTitle = $("turn-title");
+      const turnStatus = $("turn-status");
+      const thinkingView = $("thinking-view");
+      const wordForm = $("word-form");
+      const nextWordInput = $("next-word");
+      const retryView = $("retry-view");
+      const retryError = $("retry-error");
+      const turnHint = $("turn-hint");
+      const completePanel = $("complete-panel");
+      const gameMessage = $("game-message");
+
+      let workerEndpoint = "";
+      let words = [];
+      let aiThinking = false;
+      let aiNeedsRetry = false;
+      let complete = false;
+
+      function setConnection(message, ready) {
+        connectionText.textContent = message;
+        connectionDot.classList.toggle("ready", Boolean(ready));
+      }
+
+      function normaliseEndpoint(value) {
+        let url;
+        try {
+          url = new URL(value.trim());
+        } catch {
+          throw new Error("Enter a valid Worker URL.");
+        }
+
+        if (url.protocol !== "https:" && !(url.protocol === "http:" && ["localhost", "127.0.0.1"].includes(url.hostname))) {
+          throw new Error("Use an HTTPS Worker URL (HTTP is only allowed on localhost).");
+        }
+
+        if (!url.pathname.replace(/\\/+$/, "").endsWith("/next-word")) {
+          url.pathname = url.pathname.replace(/\\/+$/, "") + "/next-word";
+        }
+        url.hash = "";
+        return url.toString();
+      }
+
+      function saveEndpoint(value) {
+        const endpoint = normaliseEndpoint(value);
+        workerEndpoint = endpoint;
+        workerUrlInput.value = endpoint.replace(/\\/next-word\\/?$/, "");
+        try {
+          localStorage.setItem("100words-worker-url", workerEndpoint);
+        } catch {
+          // The endpoint remains available for this page session.
+        }
+        setConnection("Worker URL saved", true);
+        settings.open = false;
+        setupHint.textContent = "Connection saved. Start with a single word; Mistral takes the next turn automatically.";
+        setupHint.classList.remove("error");
+        return endpoint;
+      }
+
+      function restoreEndpoint() {
+        let saved = "";
+        try {
+          saved = localStorage.getItem("100words-worker-url") || "";
+        } catch {
+          // Storage may be disabled by the browser.
+        }
+        if (saved) {
+          try {
+            workerEndpoint = normaliseEndpoint(saved);
+            workerUrlInput.value = workerEndpoint.replace(/\\/next-word\\/?$/, "");
+            setConnection("Worker URL loaded", true);
+          } catch {
+            setConnection("Saved Worker URL is invalid", false);
+            settings.open = true;
+          }
+        } else {
+          settings.open = true;
+          setConnection("Worker URL not configured", false);
+        }
+      }
+
+      function isOneWord(value) {
+        return WORD_PATTERN.test(value.trim()) && !/\\s/u.test(value.trim());
+      }
+
+      function renderStory() {
+        storyWords.replaceChildren();
+        for (const entry of words) {
+          const chip = document.createElement("span");
+          chip.className = "word-chip " + (entry.by === "you" ? "you" : "ai");
+          chip.textContent = entry.text;
+          chip.title = entry.by === "you" ? "Your word" : "Mistral's word";
+          storyWords.append(chip);
+        }
+
+        const count = words.length;
+        wordCount.textContent = String(count);
+        meterFill.style.width = count + "%";
+        wordMeter.setAttribute("aria-valuenow", String(count));
+      }
+
+      function finishIfFull() {
+        if (words.length < 100) return false;
+        complete = true;
+        aiThinking = false;
+        aiNeedsRetry = false;
+        thinkingView.hidden = true;
+        wordForm.hidden = true;
+        retryView.hidden = true;
+        turnPanel.hidden = true;
+        completePanel.hidden = false;
+        gameMessage.textContent = "Round complete · 100 words";
+        renderStory();
+        return true;
+      }
+
+      function showAiThinking() {
+        aiThinking = true;
+        aiNeedsRetry = false;
+        turnPanel.hidden = false;
+        turnAvatar.classList.add("ai");
+        turnAvatar.textContent = "✦";
+        turnTitle.textContent = "Mistral's turn";
+        turnStatus.textContent = "Adding one word…";
+        thinkingView.hidden = false;
+        wordForm.hidden = true;
+        retryView.hidden = true;
+        turnHint.textContent = "";
+        gameMessage.textContent = "Mistral is choosing the next word.";
+      }
+
+      function showUserTurn() {
+        aiThinking = false;
+        aiNeedsRetry = false;
+        turnPanel.hidden = false;
+        turnAvatar.classList.remove("ai");
+        turnAvatar.textContent = "Y";
+        turnTitle.textContent = "Your turn";
+        turnStatus.textContent = "Add exactly one word";
+        thinkingView.hidden = true;
+        wordForm.hidden = false;
+        retryView.hidden = true;
+        nextWordInput.disabled = false;
+        wordForm.querySelector("button").disabled = !nextWordInput.value.trim();
+        turnHint.textContent = "Your word will be followed by Mistral's word.";
+        gameMessage.textContent = "Your turn · add one word to continue.";
+        nextWordInput.focus();
+      }
+
+      function showAiError(message) {
+        aiThinking = false;
+        aiNeedsRetry = true;
+        turnPanel.hidden = false;
+        thinkingView.hidden = true;
+        wordForm.hidden = true;
+        retryView.hidden = false;
+        retryError.textContent = message;
+        turnAvatar.classList.add("ai");
+        turnAvatar.textContent = "✦";
+        turnTitle.textContent = "Mistral's turn";
+        turnStatus.textContent = "Waiting to retry";
+        gameMessage.textContent = "Your word is saved. Mistral still needs to take its turn.";
+      }
+
+      async function askMistral() {
+        if (aiThinking || complete || words.length >= 100) return;
+        if (!workerEndpoint) {
+          settings.open = true;
+          showAiError("Save your Cloudflare Worker URL in API settings first.");
+          return;
+        }
+
+        showAiThinking();
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 35000);
+          let response;
+          try {
+            response = await fetch(workerEndpoint, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ sentence: words.map((entry) => entry.text).join(" ") }),
+              signal: controller.signal
+            });
+          } finally {
+            clearTimeout(timeout);
+          }
+
+          const body = await response.text();
+          if (!response.ok) {
+            let message = body || "The Worker request failed.";
+            try {
+              const parsed = JSON.parse(body);
+              message = parsed.error || message;
+            } catch {
+              // Keep the plain-text error.
+            }
+            throw new Error(message + " (HTTP " + response.status + ")");
+          }
+
+          const word = body.trim();
+          if (!isOneWord(word)) {
+            throw new Error("The Worker did not return exactly one word. Check its response and try again.");
+          }
+
+          words.push({ text: word, by: "ai" });
+          renderStory();
+          if (!finishIfFull()) showUserTurn();
+        } catch (error) {
+          const message = error.name === "AbortError"
+            ? "The request timed out. Check the Worker and try again."
+            : (error.message || "Could not reach the Worker. Check your connection.");
+          showAiError(message);
+        }
+      }
+
+      endpointForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        try {
+          saveEndpoint(workerUrlInput.value);
+        } catch (error) {
+          setConnection(error.message, false);
+        }
+      });
+
+      $("start-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const first = starterInput.value.trim();
+        if (!isOneWord(first)) {
+          setupHint.textContent = "Enter exactly one word, with no spaces.";
+          setupHint.classList.add("error");
+          starterInput.focus();
+          return;
+        }
+        if (!workerEndpoint) {
+          settings.open = true;
+          setupHint.textContent = "Add your deployed Cloudflare Worker URL in API settings first.";
+          setupHint.classList.add("error");
+          workerUrlInput.focus();
+          return;
+        }
+
+        words = [{ text: first, by: "you" }];
+        complete = false;
+        aiThinking = false;
+        aiNeedsRetry = false;
+        setupView.hidden = true;
+        gameView.hidden = false;
+        completePanel.hidden = true;
+        turnPanel.hidden = false;
+        renderStory();
+        askMistral();
+      });
+
+      wordForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        if (aiThinking || complete) return;
+        const value = nextWordInput.value.trim();
+        if (!isOneWord(value)) {
+          turnHint.textContent = "Enter exactly one word, with no spaces.";
+          turnHint.classList.add("error");
+          nextWordInput.focus();
+          return;
+        }
+
+        words.push({ text: value, by: "you" });
+        nextWordInput.value = "";
+        turnHint.classList.remove("error");
+        renderStory();
+        if (!finishIfFull()) askMistral();
+      });
+
+      nextWordInput.addEventListener("input", () => {
+        wordForm.querySelector("button").disabled = !nextWordInput.value.trim();
+        turnHint.textContent = "";
+        turnHint.classList.remove("error");
+      });
+
+      $("retry-button").addEventListener("click", askMistral);
+
+      $("copy-story").addEventListener("click", async () => {
+        const story = words.map((entry) => entry.text).join(" ");
+        try {
+          await navigator.clipboard.writeText(story);
+          gameMessage.textContent = "Story copied to clipboard.";
+        } catch {
+          gameMessage.textContent = story;
+        }
+      });
+
+      function resetGame() {
+        words = [];
+        complete = false;
+        aiThinking = false;
+        aiNeedsRetry = false;
+        gameView.hidden = true;
+        setupView.hidden = false;
+        completePanel.hidden = true;
+        turnPanel.hidden = false;
+        starterInput.value = "";
+        setupHint.textContent = "Start with a single word. Mistral takes the next turn automatically.";
+        setupHint.classList.remove("error");
+        starterInput.focus();
+      }
+
+      $("play-again").addEventListener("click", resetGame);
+      restoreEndpoint();
+    })();
+  </script>
+</body>
+</html>
