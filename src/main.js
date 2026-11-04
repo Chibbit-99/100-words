@@ -52,8 +52,24 @@ function setBusy(busy) {
   $("clear-chat").disabled = busy;
 }
 
-function showProgress(text, progress) {
+function showIndeterminateProgress(text) {
   loadPanel.hidden = false;
+  loadLabel.textContent = text;
+  loadPercent.textContent = "…";
+  loadProgress.classList.add("is-indeterminate");
+  loadProgress.style.width = "28%";
+}
+
+function showProgress(text, progress) {
+  if (text?.toLowerCase().includes("start to fetch params")) {
+    // WebLLM reports parameter progress after a whole shard has been loaded.
+    // Keep the UI animated until the first shard completes.
+    showIndeterminateProgress("Loading model parameters · first shard (~33.5 MB)");
+    return;
+  }
+
+  loadPanel.hidden = false;
+  loadProgress.classList.remove("is-indeterminate");
   loadLabel.textContent = text || "Preparing model…";
   const percent = Math.max(0, Math.min(100, Math.round((progress || 0) * 100)));
   loadPercent.textContent = percent + "%";
@@ -62,6 +78,7 @@ function showProgress(text, progress) {
 
 function hideProgress() {
   loadPanel.hidden = true;
+  loadProgress.classList.remove("is-indeterminate");
 }
 
 async function loadModel() {
@@ -70,8 +87,8 @@ async function loadModel() {
   engine = null;
   activeModel = "";
   setBusy(true);
-  composerHint.textContent = "Downloading and preparing the model…";
-  showProgress("Starting model…", 0);
+  composerHint.textContent = "Preparing SmolLM2-360M…";
+  showIndeterminateProgress("Preparing WebGPU runtime and tokenizer…");
   try {
     const nextEngine = await CreateMLCEngine(MODEL_ID, {
       initProgressCallback: (report) => showProgress(report.text, report.progress)
