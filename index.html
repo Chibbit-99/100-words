@@ -376,8 +376,9 @@
           throw new Error("Use an HTTPS Worker URL (HTTP is only allowed on localhost).");
         }
 
-        if (!url.pathname.replace(/\/+$/, "").endsWith("/next-word")) {
-          url.pathname = url.pathname.replace(/\/+$/, "") + "/next-word";
+        url.pathname = url.pathname.replace(/\/+$/, "");
+        if (!url.pathname.endsWith("/next-word")) {
+          url.pathname += "/next-word";
         }
         url.hash = "";
         return url.toString();
