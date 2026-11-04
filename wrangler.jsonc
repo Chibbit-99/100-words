@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "100-words-api",
+  "main": "./worker.js",
+  "compatibility_date": "2026-11-04",
+  "workers_dev": true,
+  "vars": {
+    "MISTRAL_MODEL": "ministral-3b-2512",
+    "ALLOWED_ORIGINS": "*"
+  }
+}
