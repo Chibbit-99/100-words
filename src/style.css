@@ -16,9 +16,9 @@
 
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; min-height: 100vh; }
-button, textarea, select { font: inherit; }
+button, textarea { font: inherit; }
 button { cursor: pointer; }
-button:disabled, select:disabled { cursor: not-allowed; opacity: .5; }
+button:disabled { cursor: not-allowed; opacity: .5; }
 #app { display: flex; min-height: 100vh; }
 
 .sidebar {
@@ -38,8 +38,8 @@ button:disabled, select:disabled { cursor: not-allowed; opacity: .5; }
 .main { display: flex; flex: 1; min-width: 0; flex-direction: column; min-height: 100vh; }
 .topbar { height: 68px; flex: 0 0 68px; display: flex; align-items: center; justify-content: flex-end; gap: 18px; padding: 0 34px; border-bottom: 1px solid var(--line); }
 .model-area { display: flex; align-items: center; gap: 12px; }
-.model-area label { color: #73747f; font: 10px "DM Mono", monospace; letter-spacing: 1px; }
-.model-area select { max-width: min(380px, 48vw); padding: 8px 30px 8px 10px; color: #d9d5e1; background: #1b1c22; border: 1px solid #30313a; border-radius: 7px; font-size: 12px; outline: none; }
+.model-label { color: #73747f; font: 10px "DM Mono", monospace; letter-spacing: 1px; }
+.model-name { padding: 8px 10px; color: #d9d5e1; background: #1b1c22; border: 1px solid #30313a; border-radius: 7px; font-size: 12px; }
 .icon-button { width: 34px; height: 34px; color: #9b9ba5; background: transparent; border: 1px solid var(--line); border-radius: 8px; font-size: 18px; }
 .mobile-brand { display: none; }
 
@@ -84,8 +84,8 @@ button:disabled, select:disabled { cursor: not-allowed; opacity: .5; }
   .mobile-brand { display: block; color: #f2f0f7; font-weight: 700; font-size: 15px; }
   .mobile-brand span { font-weight: 400; color: #aaa5b4; }
   .model-area { gap: 7px; }
-  .model-area label { display: none; }
-  .model-area select { max-width: 55vw; font-size: 10px; }
+  .model-label { display: none; }
+  .model-name { max-width: 55vw; font-size: 10px; }
   .conversation { padding: 38px 19px 25px; }
   .welcome { margin-top: 42px; }
   .welcome h1 { letter-spacing: -3px; }
