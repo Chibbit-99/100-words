@@ -34,7 +34,7 @@ The request must contain between 1 and 99 whitespace-separated words. The Worker
 
 ## Model
 
-The default model is `ministral-3b-2512` (Ministral 3 3B). Change `MISTRAL_MODEL` in `wrangler.jsonc` to use another model available to your Mistral API account.
+The Worker is pinned to `mistral-small-2603` (Mistral Small 4). It sends `reasoning_effort: "none"` to keep one-word turns focused and avoid a separate reasoning trace.
 
 ## Deploy to Cloudflare Workers
 
@@ -99,7 +99,7 @@ curl -X POST "https://100-words-api.<your-workers-dev-subdomain>.workers.dev/nex
 ## Configuration notes
 
 - `MISTRAL_API_KEY` is a Cloudflare secret and is never exposed in responses.
-- `MISTRAL_MODEL` defaults to `ministral-3b-2512`.
+- `MISTRAL_MODEL` defaults to `mistral-small-2603`.
 - `ALLOWED_ORIGINS` defaults to `*` for easy integration. For production, replace it with your frontend origin(s), comma-separated.
 - The Worker validates story length and the generated one-word response.
 - The endpoint is public when deployed on `workers.dev`. Set up a Cloudflare rate-limit rule before sharing it widely, as calls can incur Mistral API usage.
