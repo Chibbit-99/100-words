@@ -16,14 +16,10 @@ Request:
 }
 ```
 
-Success response:
+Success response (plain text, exactly one word):
 
-```json
-{
-  "word": "restless",
-  "wordCount": 7,
-  "complete": false
-}
+```text
+restless
 ```
 
 The request must contain between 1 and 99 whitespace-separated words. The Worker refuses to add a word once the story already has 100. The generated `word` is validated as a single word before it is returned.
