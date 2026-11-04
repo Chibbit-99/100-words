@@ -324,7 +324,7 @@
     (() => {
       "use strict";
 
-      const WORD_PATTERN = /^[\\p{L}\\p{M}\\p{N}]+(?:[’'-][\\p{L}\\p{M}\\p{N}]+)*[.,!?;:…]*$/u;
+      const WORD_PATTERN = /^[\p{L}\p{M}\p{N}]+(?:[’'-][\p{L}\p{M}\p{N}]+)*[.,!?;:…]*$/u;
       const $ = (id) => document.getElementById(id);
 
       const settings = $("settings");
@@ -376,8 +376,8 @@
           throw new Error("Use an HTTPS Worker URL (HTTP is only allowed on localhost).");
         }
 
-        if (!url.pathname.replace(/\\/+$/, "").endsWith("/next-word")) {
-          url.pathname = url.pathname.replace(/\\/+$/, "") + "/next-word";
+        if (!url.pathname.replace(/\/+$/, "").endsWith("/next-word")) {
+          url.pathname = url.pathname.replace(/\/+$/, "") + "/next-word";
         }
         url.hash = "";
         return url.toString();
@@ -386,7 +386,7 @@
       function saveEndpoint(value) {
         const endpoint = normaliseEndpoint(value);
         workerEndpoint = endpoint;
-        workerUrlInput.value = endpoint.replace(/\\/next-word\\/?$/, "");
+        workerUrlInput.value = endpoint.replace(/\/next-word\/?$/, "");
         try {
           localStorage.setItem("100words-worker-url", workerEndpoint);
         } catch {
@@ -409,7 +409,7 @@
         if (saved) {
           try {
             workerEndpoint = normaliseEndpoint(saved);
-            workerUrlInput.value = workerEndpoint.replace(/\\/next-word\\/?$/, "");
+            workerUrlInput.value = workerEndpoint.replace(/\/next-word\/?$/, "");
             setConnection("Worker URL loaded", true);
           } catch {
             setConnection("Saved Worker URL is invalid", false);
@@ -422,7 +422,7 @@
       }
 
       function isOneWord(value) {
-        return WORD_PATTERN.test(value.trim()) && !/\\s/u.test(value.trim());
+        return WORD_PATTERN.test(value.trim()) && !/\s/u.test(value.trim());
       }
 
       function renderStory() {
