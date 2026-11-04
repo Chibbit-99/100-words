@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101114" />
+    <meta name="description" content="A local, browser-based AI chat powered by WebGPU." />
+    <title>100 words</title>
+    <script type="module" crossorigin src="./assets/index-DKfhI_wR.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-bWkgFj9M.css">
+  </head>
+  <body>
+    <div id="app">
+      <aside class="sidebar">
+        <a class="brand" href="/" aria-label="100 words home">
+          <span class="brand-mark">100</span>
+          <span>words</span>
+        </a>
+        <button id="new-chat" class="new-chat" type="button"><span>＋</span> New chat</button>
+        <div class="sidebar-label">LOCAL IN THIS BROWSER</div>
+        <div class="sidebar-note">Your messages stay in this tab. The model runs on your device.</div>
+        <div class="sidebar-footer">
+          <span class="status-dot"></span>
+          <span id="device-status">Checking WebGPU…</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="mobile-brand">100 <span>words</span></div>
+          <div class="model-area">
+            <label for="model-select">MODEL</label>
+            <select id="model-select" aria-label="Choose a language model">
+              <option>Loading available models…</option>
+            </select>
+          </div>
+          <button id="clear-chat" class="icon-button" type="button" title="Clear conversation" aria-label="Clear conversation">⌫</button>
+        </header>
+
+        <section class="conversation" id="conversation" aria-live="polite">
+          <div class="welcome" id="welcome">
+            <div class="welcome-kicker">A LITTLE LOCAL INTELLIGENCE</div>
+            <h1>What’s on<br /><span>your mind?</span></h1>
+            <p>Pick a model and start chatting. Everything runs locally in your browser with WebGPU.</p>
+            <div class="suggestions">
+              <button class="suggestion" type="button" data-prompt="Explain a difficult idea in simple terms.">Explain something</button>
+              <button class="suggestion" type="button" data-prompt="Give me three creative ideas for a weekend project.">Brainstorm ideas</button>
+              <button class="suggestion" type="button" data-prompt="Help me debug this code: ">Debug some code</button>
+            </div>
+          </div>
+          <div id="messages" class="messages"></div>
+        </section>
+
+        <footer class="composer-wrap">
+          <div id="load-panel" class="load-panel" hidden>
+            <div class="load-top"><span id="load-label">Preparing model…</span><span id="load-percent">0%</span></div>
+            <div class="progress-track"><div id="load-progress"></div></div>
+          </div>
+          <form id="chat-form" class="composer">
+            <textarea id="prompt" rows="1" placeholder="Message 100 words…" aria-label="Message" disabled></textarea>
+            <div class="composer-bottom">
+              <span class="composer-hint" id="composer-hint">Choose a model to get started</span>
+              <button id="send-button" type="submit" disabled aria-label="Send message">↑</button>
+            </div>
+          </form>
+          <p class="disclaimer">AI can make mistakes. Models are downloaded to your browser and may use significant memory.</p>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>
